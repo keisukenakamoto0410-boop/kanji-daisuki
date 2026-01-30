@@ -71,6 +71,7 @@ export default function PostDetailClient({ post, currentUserId }: PostDetailClie
           .eq('user_id', currentUserId)
           .eq('post_id', post.id)
 
+        // Trigger will automatically update likes_count in posts table
         setLikesCount((prev) => Math.max(0, prev - 1))
         setHasLiked(false)
       } else {
@@ -80,6 +81,7 @@ export default function PostDetailClient({ post, currentUserId }: PostDetailClie
           post_id: post.id,
         })
 
+        // Trigger will automatically update likes_count in posts table
         setLikesCount((prev) => prev + 1)
         setHasLiked(true)
       }

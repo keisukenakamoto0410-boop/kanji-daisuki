@@ -104,9 +104,34 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   const posts = (postsResult || []) as Post[]
 
-  // Add author info to posts
-  let postsWithAuthor: PostWithAuthor[] = posts.map(post => ({
+  // Get actual likes count from likes table
+  const postIds = posts.map(p => p.id)
+  let likesCountMap: Record<number, number> = {}
+  let likedPostIds = new Set<number>()
+
+  if (postIds.length > 0) {
+    const { data: likesData } = await supabase
+      .from('likes')
+      .select('post_id, user_id')
+      .in('post_id', postIds)
+
+    if (likesData) {
+      // Count likes per post
+      for (const like of likesData as { post_id: number; user_id: string }[]) {
+        likesCountMap[like.post_id] = (likesCountMap[like.post_id] || 0) + 1
+        // Check if current user has liked
+        if (user && like.user_id === user.id) {
+          likedPostIds.add(like.post_id)
+        }
+      }
+    }
+  }
+
+  // Add author info and likes count to posts
+  const postsWithAuthor: PostWithAuthor[] = posts.map(post => ({
     ...post,
+    likes_count: likesCountMap[post.id] || 0,
+    user_has_liked: likedPostIds.has(post.id),
     author: {
       username: profileData.username,
       display_name: profileData.display_name,
@@ -115,21 +140,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       kanji_char: profileData.kanjis?.char || null,
     }
   }))
-
-  // Add like info if logged in
-  if (user && posts.length > 0) {
-    const { data: likes } = await supabase
-      .from('likes')
-      .select('post_id')
-      .eq('user_id', user.id)
-
-    const likedPostIds = new Set((likes || []).map((l: { post_id: number }) => l.post_id))
-
-    postsWithAuthor = postsWithAuthor.map(post => ({
-      ...post,
-      user_has_liked: likedPostIds.has(post.id),
-    }))
-  }
 
   const kanjiChar = profileData.kanjis?.char || '?'
   const activeSelection = profileData.kanji_selections?.find((s) => s.is_active)

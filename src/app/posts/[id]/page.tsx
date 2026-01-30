@@ -73,17 +73,18 @@ export default async function PostDetailPage({ params }: PageProps) {
     kanjiChar = kanji?.char || null
   }
 
+  // いいね数を取得
+  const { data: likesData } = await supabase
+    .from('likes')
+    .select('id, user_id')
+    .eq('post_id', post.id)
+
+  const actualLikesCount = (likesData || []).length
+
   // ユーザーがいいね済みか確認
   let userHasLiked = false
-  if (user) {
-    const { data: like } = await supabase
-      .from('likes')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('post_id', post.id)
-      .single()
-
-    userHasLiked = !!like
+  if (user && likesData) {
+    userHasLiked = likesData.some((like: { user_id: string }) => like.user_id === user.id)
   }
 
   // コメントを取得
@@ -150,6 +151,7 @@ export default async function PostDetailPage({ params }: PageProps) {
 
   const postWithAuthor: PostWithAuthor = {
     ...post,
+    likes_count: actualLikesCount,
     user_has_liked: userHasLiked,
     author: profile ? {
       username: profile.username,

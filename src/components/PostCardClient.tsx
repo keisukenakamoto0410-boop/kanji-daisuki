@@ -91,7 +91,7 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
 
     try {
       if (currentUserId) {
-        // ログインユーザーの場合はDBに保存
+        // ログインユーザーの場合はDBに保存（トリガーが自動でlikes_countを更新）
         if (hasLiked) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase.from('likes') as any)
@@ -119,13 +119,29 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
           // いいね解除
           const newLikedPosts = likedPosts.filter(id => id !== post.id)
           localStorage.setItem('anonymousLikes', JSON.stringify(newLikedPosts))
-          setLikesCount((prev) => Math.max(0, prev - 1))
+
+          // Update likes_count in posts table (anonymous likes need manual update)
+          const newCount = Math.max(0, likesCount - 1)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('posts') as any)
+            .update({ likes_count: newCount })
+            .eq('id', post.id)
+
+          setLikesCount(newCount)
           setHasLiked(false)
         } else {
           // いいね追加
           likedPosts.push(post.id)
           localStorage.setItem('anonymousLikes', JSON.stringify(likedPosts))
-          setLikesCount((prev) => prev + 1)
+
+          // Update likes_count in posts table (anonymous likes need manual update)
+          const newCount = likesCount + 1
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('posts') as any)
+            .update({ likes_count: newCount })
+            .eq('id', post.id)
+
+          setLikesCount(newCount)
           setHasLiked(true)
         }
       }

@@ -57,8 +57,31 @@ export default async function TimelinePage() {
 
   const posts = (postsData || []) as Post[]
 
+  // Get actual likes count from likes table for each post
+  const postIds = posts.map(p => p.id)
+  let likesCountMap: Record<number, number> = {}
+  if (postIds.length > 0) {
+    const { data: likesData } = await supabase
+      .from('likes')
+      .select('post_id')
+      .in('post_id', postIds)
+
+    if (likesData) {
+      // Count likes per post
+      for (const like of likesData as { post_id: number }[]) {
+        likesCountMap[like.post_id] = (likesCountMap[like.post_id] || 0) + 1
+      }
+    }
+  }
+
+  // Update posts with actual likes count
+  const postsWithLikesCount = posts.map(post => ({
+    ...post,
+    likes_count: likesCountMap[post.id] || 0
+  }))
+
   // Get user IDs
-  const userIds = Array.from(new Set(posts.map(p => p.user_id)))
+  const userIds = Array.from(new Set(postsWithLikesCount.map(p => p.user_id)))
 
   // Fetch author info
   type ProfileWithKanjiChar = Profile & { kanji_char: string | null }
@@ -101,7 +124,7 @@ export default async function TimelinePage() {
     }
   }
 
-  let postsWithAuthor: PostWithAuthor[] = posts.map(post => ({
+  let postsWithAuthor: PostWithAuthor[] = postsWithLikesCount.map(post => ({
     ...post,
     author: profilesMap[post.user_id] ? {
       username: profilesMap[post.user_id].username,
@@ -112,7 +135,7 @@ export default async function TimelinePage() {
     } : null
   }))
 
-  if (user && posts.length > 0) {
+  if (user && postsWithLikesCount.length > 0) {
     const { data: likes } = await supabase
       .from('likes')
       .select('post_id')
