@@ -145,10 +145,15 @@ export default async function HomePage() {
             Connect with Kanji lovers worldwide.
           </p>
 
-          <Link href="/select" className="btn-primary text-xl px-12 py-5 inline-flex items-center gap-2">
-            <Sparkles className="w-6 h-6" />
-            Choose Your Kanji
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/select" className="btn-primary text-xl px-12 py-5 inline-flex items-center justify-center gap-2">
+              <Sparkles className="w-6 h-6" />
+              Choose Your Kanji
+            </Link>
+            <Link href="/timeline" className="btn-secondary text-xl px-12 py-5 inline-flex items-center justify-center">
+              View Timeline
+            </Link>
+          </div>
         </div>
 
         {/* Scroll indicator */}
