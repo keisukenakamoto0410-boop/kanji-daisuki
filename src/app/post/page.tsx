@@ -32,6 +32,8 @@ export default async function PostPage() {
     bio: null,
     is_paid: false,
     selected_kanji_id: null,
+    country: null,
+    age_group: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     kanjis: null,

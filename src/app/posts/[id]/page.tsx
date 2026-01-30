@@ -99,7 +99,8 @@ export default async function PostDetailPage({ params }: PageProps) {
   const commentUserIds = Array.from(new Set(comments.map(c => c.user_id)))
 
   // コメント投稿者情報を取得
-  let commentProfilesMap: Record<string, { username: string; display_name: string | null; avatar_url: string | null; selected_kanji_id: number | null }> = {}
+  type CommentProfile = { id: string; username: string; display_name: string | null; avatar_url: string | null; selected_kanji_id: number | null }
+  let commentProfilesMap: Record<string, CommentProfile> = {}
   if (commentUserIds.length > 0) {
     const { data: commentProfiles } = await supabase
       .from('profiles')
@@ -107,8 +108,9 @@ export default async function PostDetailPage({ params }: PageProps) {
       .in('id', commentUserIds)
 
     if (commentProfiles) {
+      const profiles = commentProfiles as CommentProfile[]
       commentProfilesMap = Object.fromEntries(
-        commentProfiles.map(p => [p.id, p])
+        profiles.map(p => [p.id, p])
       )
     }
   }
@@ -126,8 +128,9 @@ export default async function PostDetailPage({ params }: PageProps) {
       .in('id', kanjiIds)
 
     if (kanjisData) {
+      const kanjis = kanjisData as { id: number; char: string }[]
       kanjisMap = Object.fromEntries(
-        kanjisData.map(k => [k.id, k.char])
+        kanjis.map(k => [k.id, k.char])
       )
     }
   }

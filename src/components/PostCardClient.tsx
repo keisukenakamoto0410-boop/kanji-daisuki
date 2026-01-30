@@ -57,7 +57,6 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
-  const [showShareMenu, setShowShareMenu] = useState(false)
 
   const supabase = createClient()
   const author = post.author
@@ -122,7 +121,6 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
     try {
       await navigator.clipboard.writeText(url)
       alert('Link copied!')
-      setShowShareMenu(false)
     } catch (error) {
       console.error('Error copying to clipboard:', error)
     }
@@ -135,7 +133,6 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
     const url = `${window.location.origin}/posts/${post.id}`
     const text = content.slice(0, 100) + (content.length > 100 ? '...' : '')
     window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank')
-    setShowShareMenu(false)
   }
 
   const handleShareFacebook = (e: React.MouseEvent) => {
@@ -144,7 +141,6 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
 
     const url = `${window.location.origin}/posts/${post.id}`
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
-    setShowShareMenu(false)
   }
 
   const handleNativeShare = async (e: React.MouseEvent) => {
@@ -167,14 +163,12 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
       await navigator.clipboard.writeText(url)
       alert('Link copied!')
     }
-    setShowShareMenu(false)
   }
 
   const handleMenuToggle = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setShowMenu(!showMenu)
-    setShowShareMenu(false)
   }
 
   const handleEdit = (e: React.MouseEvent) => {

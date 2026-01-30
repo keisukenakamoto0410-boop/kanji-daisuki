@@ -74,19 +74,22 @@ export default function CommentSection({ postId, initialComments, currentUserId 
       if (error) throw error
 
       // Fetch user info
-      const { data: profileData } = await supabase
+      const { data: profileResult } = await supabase
         .from('profiles')
         .select('username, display_name, avatar_url, selected_kanji_id')
         .eq('id', currentUserId)
         .single()
 
+      const profileData = profileResult as { username: string; display_name: string | null; avatar_url: string | null; selected_kanji_id: number | null } | null
+
       let kanjiChar: string | null = null
       if (profileData?.selected_kanji_id) {
-        const { data: kanjiData } = await supabase
+        const { data: kanjiResult } = await supabase
           .from('kanjis')
           .select('char')
           .eq('id', profileData.selected_kanji_id)
           .single()
+        const kanjiData = kanjiResult as { char: string } | null
         kanjiChar = kanjiData?.char || null
       }
 
