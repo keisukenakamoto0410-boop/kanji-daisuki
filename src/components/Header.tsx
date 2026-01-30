@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
-import { Search, PenSquare, LogOut, User, Settings, Home, Menu, X } from 'lucide-react'
+import { Search, PenSquare, LogOut, User, Settings, Home, Menu, X, Shield } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Profile, Kanji } from '@/types/database'
 import { useState } from 'react'
@@ -85,6 +85,20 @@ export default function Header({ user, profile }: HeaderProps) {
               >
                 Post
               </Link>
+
+              {/* Admin - admin only */}
+              {profile?.is_admin && (
+                <Link
+                  href="/admin"
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    isActive('/admin')
+                      ? 'bg-red-100 text-red-700'
+                      : 'text-red-600 hover:text-red-700 hover:bg-red-50'
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
 
               {/* Profile icon */}
               <Link
@@ -194,6 +208,22 @@ export default function Header({ user, profile }: HeaderProps) {
                 <PenSquare className="w-5 h-5" />
                 Post
               </Link>
+
+              {/* Admin - admin only */}
+              {profile?.is_admin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                    isActive('/admin')
+                      ? 'bg-red-100 text-red-700'
+                      : 'text-red-600 hover:bg-red-50'
+                  }`}
+                >
+                  <Shield className="w-5 h-5" />
+                  Admin
+                </Link>
+              )}
 
               <Link
                 href={profile?.username ? `/profile/${profile.username}` : '/settings'}
