@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Profile, Kanji } from '@/types/database'
-import { Check, Sparkles, Heart, DollarSign, School, Server, Trophy, Users } from 'lucide-react'
+import { Check, Sparkles, Heart, School, Server, Users } from 'lucide-react'
 
 export const revalidate = 0
 

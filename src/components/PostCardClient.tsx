@@ -177,13 +177,6 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
     setShowShareMenu(false)
   }
 
-  const handleShareMenuToggle = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowShareMenu(!showShareMenu)
-    setShowMenu(false)
-  }
-
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
