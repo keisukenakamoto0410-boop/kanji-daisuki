@@ -25,13 +25,38 @@ export default async function AdminPage() {
     redirect('/')
   }
 
-  // Fetch all users with their selected kanji
+  // Fetch all users
   const { data: usersData } = await supabase
     .from('profiles')
-    .select('*, kanjis(*)')
+    .select('*')
     .order('created_at', { ascending: false })
 
-  const users = (usersData || []) as (Profile & { kanjis: Kanji | null })[]
+  const profiles = (usersData || []) as Profile[]
+
+  // Fetch kanjis for users who have selected one
+  const kanjiIds = profiles
+    .map(p => p.selected_kanji_id)
+    .filter((id): id is number => id !== null)
+
+  let kanjisMap: Record<number, Kanji> = {}
+  if (kanjiIds.length > 0) {
+    const { data: kanjisData } = await supabase
+      .from('kanjis')
+      .select('*')
+      .in('id', kanjiIds)
+
+    if (kanjisData) {
+      kanjisMap = Object.fromEntries(
+        (kanjisData as Kanji[]).map(k => [k.id, k])
+      )
+    }
+  }
+
+  // Combine profiles with kanjis
+  const users = profiles.map(profile => ({
+    ...profile,
+    kanjis: profile.selected_kanji_id ? kanjisMap[profile.selected_kanji_id] || null : null
+  })) as (Profile & { kanjis: Kanji | null })[]
 
   // Fetch all posts
   const { data: postsData } = await supabase

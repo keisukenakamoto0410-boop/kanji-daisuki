@@ -10,10 +10,15 @@ type User = {
   username: string
   display_name: string | null
   avatar_url: string | null
+  bio: string | null
   is_paid: boolean
   is_admin: boolean
+  selected_kanji_id: number | null
+  country: string | null
+  age_group: string | null
   created_at: string
-  kanjis: { char: string; reading_kun: string | null } | null
+  updated_at: string
+  kanjis: { id: number; char: string; reading_kun: string | null; reading_on: string | null; meaning_en: string | null } | null
 }
 
 type Post = {
@@ -362,6 +367,9 @@ export default function AdminDashboard({ users: initialUsers, posts: initialPost
                 </tbody>
               </table>
             </div>
+            {users.length === 0 && (
+              <p className="text-center text-muted py-8">ユーザーがいません</p>
+            )}
           </div>
           <Pagination currentPage={userPage} totalPages={totalUserPages} onPageChange={setUserPage} />
         </div>
@@ -428,6 +436,9 @@ export default function AdminDashboard({ users: initialUsers, posts: initialPost
                 </tbody>
               </table>
             </div>
+            {posts.length === 0 && (
+              <p className="text-center text-muted py-8">投稿がありません</p>
+            )}
           </div>
           <Pagination currentPage={postPage} totalPages={totalPostPages} onPageChange={setPostPage} />
         </div>
