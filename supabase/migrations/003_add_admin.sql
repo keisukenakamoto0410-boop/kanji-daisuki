@@ -55,3 +55,27 @@ CREATE POLICY "Admins can update any profile"
       AND admin_check.is_admin = true
     )
   );
+
+-- Allow admins to delete any profile
+DROP POLICY IF EXISTS "Admins can delete any profile" ON profiles;
+CREATE POLICY "Admins can delete any profile"
+  ON profiles FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles AS admin_check
+      WHERE admin_check.id = auth.uid()
+      AND admin_check.is_admin = true
+    )
+  );
+
+-- Allow admins to delete any kanji_selection
+DROP POLICY IF EXISTS "Admins can delete any kanji_selection" ON kanji_selections;
+CREATE POLICY "Admins can delete any kanji_selection"
+  ON kanji_selections FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.is_admin = true
+    )
+  );

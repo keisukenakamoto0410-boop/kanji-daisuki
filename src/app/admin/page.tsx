@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AdminDashboard from './AdminDashboard'
-import { Profile, Post } from '@/types/database'
+import { Profile, Post, Comment, Kanji } from '@/types/database'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -25,32 +25,42 @@ export default async function AdminPage() {
     redirect('/')
   }
 
-  // Fetch all users
+  // Fetch all users with their selected kanji
   const { data: usersData } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, kanjis(*)')
     .order('created_at', { ascending: false })
 
-  const users = (usersData || []) as Profile[]
+  const users = (usersData || []) as (Profile & { kanjis: Kanji | null })[]
 
-  // Fetch all posts with author info
+  // Fetch all posts
   const { data: postsData } = await supabase
     .from('posts')
     .select('*')
     .order('created_at', { ascending: false })
-    .limit(100)
 
   const posts = (postsData || []) as Post[]
 
-  // Get author info for posts
-  const userIds = Array.from(new Set(posts.map(p => p.user_id)))
+  // Fetch all comments
+  const { data: commentsData } = await supabase
+    .from('comments')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  const comments = (commentsData || []) as Comment[]
+
+  // Get all user IDs from posts and comments
+  const postUserIds = posts.map(p => p.user_id)
+  const commentUserIds = comments.map(c => c.user_id)
+  const allUserIds = Array.from(new Set([...postUserIds, ...commentUserIds]))
+
   let profilesMap: Record<string, { username: string; display_name: string | null }> = {}
 
-  if (userIds.length > 0) {
+  if (allUserIds.length > 0) {
     const { data: profilesResult } = await supabase
       .from('profiles')
       .select('id, username, display_name')
-      .in('id', userIds)
+      .in('id', allUserIds)
 
     if (profilesResult) {
       const profiles = profilesResult as { id: string; username: string; display_name: string | null }[]
@@ -60,34 +70,53 @@ export default async function AdminPage() {
     }
   }
 
+  // Map posts with author
   const postsWithAuthor = posts.map(post => ({
     ...post,
     author: profilesMap[post.user_id] || null
   }))
 
+  // Map comments with author and post info
+  const postTitlesMap: Record<number, string> = {}
+  posts.forEach(p => {
+    postTitlesMap[p.id] = p.content.substring(0, 30) + (p.content.length > 30 ? '...' : '')
+  })
+
+  const commentsWithInfo = comments.map(comment => ({
+    ...comment,
+    author: profilesMap[comment.user_id] || null,
+    postPreview: postTitlesMap[comment.post_id] || 'Deleted Post'
+  }))
+
   // Stats
   const totalUsers = users.length
   const totalPosts = posts.length
+  const totalComments = comments.length
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in">
       <h1 className="text-3xl font-bold mb-8 font-display">Admin Dashboard</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="card p-6 text-center">
           <p className="text-3xl font-bold text-sakura-dark">{totalUsers}</p>
-          <p className="text-muted">Total Users</p>
+          <p className="text-muted">Users</p>
         </div>
         <div className="card p-6 text-center">
           <p className="text-3xl font-bold text-sky-dark">{totalPosts}</p>
-          <p className="text-muted">Total Posts</p>
+          <p className="text-muted">Posts</p>
+        </div>
+        <div className="card p-6 text-center">
+          <p className="text-3xl font-bold text-green-600">{totalComments}</p>
+          <p className="text-muted">Comments</p>
         </div>
       </div>
 
       <AdminDashboard
         users={users}
         posts={postsWithAuthor}
+        comments={commentsWithInfo}
       />
     </div>
   )
