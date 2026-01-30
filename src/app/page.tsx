@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Profile, Kanji } from '@/types/database'
-import { Check, Sparkles, Heart, School, Server, Users } from 'lucide-react'
+import { Check, Sparkles, Heart, School, Server, Users, UserPlus, Languages, PenSquare } from 'lucide-react'
 
 export const revalidate = 0
 
@@ -165,7 +165,73 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* Section 2: Available Kanji Slots */}
+      {/* Section 2: How to Get Started */}
+      {/* ============================================ */}
+      <section className="py-24 px-4 bg-gradient-to-b from-white to-sakura/5">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-display">How to Get Started</h2>
+            <p className="text-muted text-lg">3 simple steps to join our community</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Step 1 */}
+            <div className="text-center">
+              <div className="relative mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-sakura to-sakura-dark rounded-3xl flex items-center justify-center mx-auto shadow-lg transform hover:scale-105 transition-transform">
+                  <UserPlus className="w-12 h-12 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 md:right-8 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md font-bold text-sakura-dark text-xl">
+                  1
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Sign Up</h3>
+              <p className="text-muted">Create your free account in seconds</p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center">
+              <div className="relative mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-sky to-sky-dark rounded-3xl flex items-center justify-center mx-auto shadow-lg transform hover:scale-105 transition-transform">
+                  <Languages className="w-12 h-12 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 md:right-8 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md font-bold text-sky-dark text-xl">
+                  2
+                </div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-matcha text-white text-xs font-bold rounded-full">
+                  FREE!
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Choose Your Kanji</h3>
+              <p className="text-muted">Pick one kanji as your symbol</p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center">
+              <div className="relative mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-matcha to-matcha-dark rounded-3xl flex items-center justify-center mx-auto shadow-lg transform hover:scale-105 transition-transform">
+                  <PenSquare className="w-12 h-12 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 md:right-8 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md font-bold text-matcha-dark text-xl">
+                  3
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Post in Japanese</h3>
+              <p className="text-muted">Share your thoughts with the community</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/signup" className="btn-primary text-lg px-10 py-4 inline-flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              Get Started - It&apos;s Free!
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* Section 3: Available Kanji Slots */}
       {/* ============================================ */}
       <section className="py-24 px-4 bg-white/90">
         <div className="max-w-5xl mx-auto">
@@ -220,7 +286,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* Section 3: Pricing - FREE Campaign */}
+      {/* Section 4: Pricing - FREE Campaign */}
       {/* ============================================ */}
       <section className="py-24 px-4">
         <div className="max-w-lg mx-auto">
@@ -287,7 +353,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* Section 4: Where Your Money Will Go */}
+      {/* Section 5: Where Your Money Will Go */}
       {/* ============================================ */}
       <section className="py-24 px-4 bg-white/90">
         <div className="max-w-3xl mx-auto">
@@ -321,7 +387,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* Section 5: Popular Kanji Owners */}
+      {/* Section 6: Popular Kanji Owners */}
       {/* ============================================ */}
       {topUsers.length > 0 && (
         <section className="py-24 px-4">
@@ -370,7 +436,7 @@ export default async function HomePage() {
       )}
 
       {/* ============================================ */}
-      {/* Section 6: CTA */}
+      {/* Section 7: CTA */}
       {/* ============================================ */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sakura/20 via-transparent to-sky/20" />
@@ -394,7 +460,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* Section 7: Footer */}
+      {/* Section 8: Footer */}
       {/* ============================================ */}
       <footer className="bg-foreground text-white py-16 px-4">
         <div className="max-w-5xl mx-auto">

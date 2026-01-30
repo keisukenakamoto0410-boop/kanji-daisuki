@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Sparkles, Gift } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Kanji, Profile } from '@/types/database'
 import KanjiCard from '@/components/KanjiCard'
@@ -79,9 +79,9 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
     }
   }
 
-  const [purchaseComplete, setPurchaseComplete] = useState(false)
+  const [selectionComplete, setSelectionComplete] = useState(false)
 
-  const handlePurchase = async () => {
+  const handleConfirmSelection = async () => {
     setIsLoading(true)
     setError('')
 
@@ -119,8 +119,8 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
         .eq('user_id', userId)
         .eq('kanji_id', selectedKanji!.id)
 
-      console.log('Purchase complete! Kanji:', selectedKanji?.char)
-      setPurchaseComplete(true)
+      console.log('Selection complete! Kanji:', selectedKanji?.char)
+      setSelectionComplete(true)
 
       // Redirect to home after 2 seconds
       setTimeout(() => {
@@ -128,7 +128,7 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
         router.refresh()
       }, 2000)
     } catch (err) {
-      console.error('Purchase error:', err)
+      console.error('Selection error:', err)
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -161,8 +161,14 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
           <h1 className="text-3xl font-bold font-display text-center mb-2">
             Choose Your Kanji
           </h1>
-          <p className="text-muted text-center mb-8">
-            Select one kanji that represents you
+          <p className="text-muted text-center mb-2">
+            Pick one kanji as your symbol
+          </p>
+          <p className="text-center mb-8">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-matcha/20 text-matcha-dark rounded-full text-sm font-medium">
+              <Gift className="w-4 h-4" />
+              It&apos;s FREE!
+            </span>
           </p>
 
           {error && (
@@ -254,18 +260,18 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
         </div>
       )}
 
-      {/* Step 3: Purchase */}
+      {/* Step 3: Confirm Selection */}
       {step === 3 && selectedKanji && (
         <div className="max-w-md mx-auto text-center">
-          {purchaseComplete ? (
-            // Purchase complete screen
+          {selectionComplete ? (
+            // Selection complete screen
             <div className="py-12">
               <div className="w-32 h-32 bg-sakura/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="font-serif text-7xl text-sakura-dark">{selectedKanji.char}</span>
               </div>
               <div className="card p-6 bg-matcha/10 border-matcha/30">
                 <Check className="w-12 h-12 text-matcha mx-auto mb-4" />
-                <h2 className="text-xl font-bold font-display mb-2 text-matcha-dark">Purchase Complete!</h2>
+                <h2 className="text-xl font-bold font-display mb-2 text-matcha-dark">Selection Complete!</h2>
                 <p className="text-matcha-dark mb-4">
                   &ldquo;{selectedKanji.char}&rdquo; is now your kanji!
                 </p>
@@ -275,7 +281,7 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
               </div>
             </div>
           ) : (
-            // Purchase screen
+            // Confirmation screen
             <>
               <div className="mb-8">
                 <div className="w-32 h-32 bg-sakura/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -284,12 +290,15 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
                 <p className="text-muted">{selectedKanji.meaning_en}</p>
               </div>
 
-              <div className="card p-6 mb-6 bg-gradient-to-br from-sakura/5 to-sky/5">
+              <div className="card p-6 mb-6 bg-gradient-to-br from-matcha/10 to-sky/10 border-matcha/30">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-sakura" />
-                  <h2 className="text-xl font-bold font-display">Kanji Daisuki Premium</h2>
+                  <Sparkles className="w-5 h-5 text-matcha" />
+                  <h2 className="text-xl font-bold font-display">Free Campaign!</h2>
                 </div>
-                <p className="text-4xl font-bold text-sakura-dark mb-6">$5</p>
+                <div className="mb-4">
+                  <span className="text-sm text-muted line-through">$5</span>
+                  <p className="text-4xl font-bold text-matcha-dark">FREE</p>
+                </div>
                 <ul className="text-left space-y-3 text-sm">
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-matcha flex-shrink-0" />
@@ -317,15 +326,15 @@ export default function SelectWizard({ kanjis, profile, userId }: SelectWizardPr
               )}
 
               <button
-                onClick={handlePurchase}
+                onClick={handleConfirmSelection}
                 disabled={isLoading}
-                className="btn-primary w-full text-lg py-4"
+                className="btn-primary w-full text-lg py-4 bg-gradient-to-r from-matcha to-matcha-dark hover:from-matcha-dark hover:to-matcha"
               >
-                {isLoading ? 'Processing...' : 'Purchase (Demo)'}
+                {isLoading ? 'Processing...' : 'Get This Kanji (Free!)'}
               </button>
 
               <p className="text-xs text-muted mt-4">
-                * Demo mode - no actual payment will be processed
+                * Limited time free campaign
               </p>
             </>
           )}
