@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -62,6 +62,16 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
   const author = post.author
   const isOwnPost = currentUserId === post.user_id
 
+  // 匿名ユーザーのいいね状態を初期化
+  useEffect(() => {
+    if (!currentUserId) {
+      const likedPosts = JSON.parse(localStorage.getItem('anonymousLikes') || '[]') as number[]
+      if (likedPosts.includes(post.id)) {
+        setHasLiked(true)
+      }
+    }
+  }, [currentUserId, post.id])
+
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement
     if (target.closest('a') || target.closest('button') || target.closest('textarea')) {
@@ -75,29 +85,49 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
     e.preventDefault()
     e.stopPropagation()
 
-    if (!currentUserId || isLiking) return
+    if (isLiking) return
 
     setIsLiking(true)
 
     try {
-      if (hasLiked) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('likes') as any)
-          .delete()
-          .eq('user_id', currentUserId)
-          .eq('post_id', post.id)
+      if (currentUserId) {
+        // ログインユーザーの場合はDBに保存
+        if (hasLiked) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('likes') as any)
+            .delete()
+            .eq('user_id', currentUserId)
+            .eq('post_id', post.id)
 
-        setLikesCount((prev) => Math.max(0, prev - 1))
-        setHasLiked(false)
+          setLikesCount((prev) => Math.max(0, prev - 1))
+          setHasLiked(false)
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('likes') as any).insert({
+            user_id: currentUserId,
+            post_id: post.id,
+          })
+
+          setLikesCount((prev) => prev + 1)
+          setHasLiked(true)
+        }
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('likes') as any).insert({
-          user_id: currentUserId,
-          post_id: post.id,
-        })
+        // 未ログインユーザーの場合はローカルストレージで管理
+        const likedPosts = JSON.parse(localStorage.getItem('anonymousLikes') || '[]') as number[]
 
-        setLikesCount((prev) => prev + 1)
-        setHasLiked(true)
+        if (hasLiked) {
+          // いいね解除
+          const newLikedPosts = likedPosts.filter(id => id !== post.id)
+          localStorage.setItem('anonymousLikes', JSON.stringify(newLikedPosts))
+          setLikesCount((prev) => Math.max(0, prev - 1))
+          setHasLiked(false)
+        } else {
+          // いいね追加
+          likedPosts.push(post.id)
+          localStorage.setItem('anonymousLikes', JSON.stringify(likedPosts))
+          setLikesCount((prev) => prev + 1)
+          setHasLiked(true)
+        }
       }
     } catch (error) {
       console.error('Error toggling like:', error)
@@ -457,12 +487,12 @@ export default function PostCardClient({ post, currentUserId }: PostCardClientPr
           {/* Like button */}
           <button
             onClick={handleLike}
-            disabled={!currentUserId || isLiking}
-            className={`flex items-center gap-1.5 transition-colors ${
+            disabled={isLiking}
+            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
               hasLiked
                 ? 'text-accent'
                 : 'text-muted hover:text-accent'
-            } ${!currentUserId ? 'cursor-default opacity-50' : 'cursor-pointer'}`}
+            }`}
           >
             <Heart className={`w-5 h-5 ${hasLiked ? 'fill-current' : ''}`} />
             <span className="text-sm">{likesCount}</span>
