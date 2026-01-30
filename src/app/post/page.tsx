@@ -31,6 +31,7 @@ export default async function PostPage() {
     avatar_url: null,
     bio: null,
     is_paid: false,
+    is_admin: false,
     selected_kanji_id: null,
     country: null,
     age_group: null,

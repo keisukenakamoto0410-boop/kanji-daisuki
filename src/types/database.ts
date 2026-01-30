@@ -17,6 +17,7 @@ export interface Database {
           avatar_url: string | null
           bio: string | null
           is_paid: boolean
+          is_admin: boolean
           selected_kanji_id: number | null
           country: string | null
           age_group: string | null
@@ -30,6 +31,7 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           is_paid?: boolean
+          is_admin?: boolean
           selected_kanji_id?: number | null
           country?: string | null
           age_group?: string | null
@@ -43,6 +45,7 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           is_paid?: boolean
+          is_admin?: boolean
           selected_kanji_id?: number | null
           country?: string | null
           age_group?: string | null
