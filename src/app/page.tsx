@@ -189,7 +189,7 @@ export default async function HomePage() {
                     isFull ? 'opacity-50' : 'card-hover cursor-pointer'
                   }`}
                 >
-                  <span className="font-serif text-4xl md:text-5xl text-sakura-dark mb-2">
+                  <span className="font-serif text-4xl md:text-5xl text-foreground mb-2">
                     {kanji.char}
                   </span>
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${
@@ -344,7 +344,7 @@ export default async function HomePage() {
 
                   {/* Kanji avatar */}
                   <div className="w-20 h-20 bg-sakura/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-sakura/30 transition-colors">
-                    <span className="font-serif text-4xl text-sakura-dark">
+                    <span className="font-serif text-4xl text-foreground">
                       {user.kanji_char || '?'}
                     </span>
                   </div>
